@@ -16,16 +16,20 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="5Ru-sq-SPV">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" keyboardDismissMode="interactive" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="5Ru-sq-SPV">
                                 <rect key="frame" x="0.0" y="103" width="393" height="704"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="SgE-fh-MvS"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Gyt-Wd-OuE"/>
+                                </connections>
                             </tableView>
                             <searchBar contentMode="redraw" placeholder="App name, artist, song, album, e-book" id="VgI-Pd-vQj">
                                 <rect key="frame" x="0.0" y="59" width="393" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <textInputTraits key="textInputTraits"/>
                                 <connections>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="4Mc-Ux-CiK"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="8sL-aB-Bjg"/>
                                 </connections>
                             </searchBar>
                         </subviews>
@@ -38,6 +42,10 @@
                             <constraint firstItem="5Ru-sq-SPV" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="sKU-Np-vPF"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="searchBar" destination="VgI-Pd-vQj" id="YUL-3D-Imn"/>
+                        <outlet property="tableView" destination="5Ru-sq-SPV" id="qF7-lo-5Go"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
