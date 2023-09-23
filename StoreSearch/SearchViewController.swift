@@ -9,6 +9,9 @@ import UIKit
 
 class SearchViewController: UIViewController {
     
+    //Reminder: static, in short practical terms, let's us instantiate with out () brackets calling.
+    static let loadingCell = "LoadingCell"
+    
     //This instance variable adds an array we will use to store our fake search data(Delegate extension bellow).
     
     var searchResults = [SearchResult]()
@@ -16,6 +19,7 @@ class SearchViewController: UIViewController {
     
     //Note: every time the user enters into a search the items in this instantiated (created) Array will be updated overwriting the last.
     var hasSearched = false
+    var isLoading = false
     
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
@@ -29,9 +33,12 @@ class SearchViewController: UIViewController {
         
         //A struct within a struct..
       struct CellIdentifiers {
-        //Note: the static keyword
+        
+          //Note: the static keyword
         static let searchResultCell = "SearchResultCell"
-          static let nothingFoundCell = "NothingFoundCell"
+        static let nothingFoundCell = "NothingFoundCell"
+        static let loadingCell = "LoadingCell"
+          
           /*
            Using 'static' will allow you to access it without having to instantiate it.
            For example:
@@ -43,13 +50,24 @@ class SearchViewController: UIViewController {
       }
     }
     
-    //*******Suspect something wrong in viewdidload *******
+
     
     //VIEWDIDLOAD\\
     override func viewDidLoad() {
         
       super.viewDidLoad()
+       
+        tableView.contentInset = UIEdgeInsets(top: 50, left: 0, bottom: 0, right: 0)
         
+        var cellNib = UINib(nibName: TableView.CellIdentifiers.searchResultCell, bundle: nil)
+         tableView.register(cellNib, forCellReuseIdentifier: TableView.CellIdentifiers.searchResultCell)
+         cellNib = UINib(nibName: TableView.CellIdentifiers.nothingFoundCell, bundle: nil)
+         tableView.register(cellNib, forCellReuseIdentifier: TableView.CellIdentifiers.nothingFoundCell)
+         cellNib = UINib(nibName: TableView.CellIdentifiers.loadingCell, bundle: nil)
+         tableView.register(cellNib, forCellReuseIdentifier: TableView.CellIdentifiers.loadingCell)
+        
+        
+      /*
       tableView.contentInset = UIEdgeInsets(top: 50, left: 0, bottom: 0, right: 0)
         
         //Code to register 'nib' file (.nib) for use.
@@ -61,7 +79,7 @@ class SearchViewController: UIViewController {
       tableView.register(cellNib, forCellReuseIdentifier: TableView.CellIdentifiers.searchResultCell)
       cellNib = UINib(nibName: TableView.CellIdentifiers.nothingFoundCell, bundle: nil)
       tableView.register(cellNib, forCellReuseIdentifier: TableView.CellIdentifiers.nothingFoundCell)
-      
+      */
         
         searchBar.becomeFirstResponder()
         
@@ -97,14 +115,16 @@ class SearchViewController: UIViewController {
     //Using JSONDecoder to convert the Json data we get back in our queries
 
     func parse(data: Data) -> [SearchResult] {
+        
       do {
         let decoder = JSONDecoder()
         let result = try decoder.decode(
           ResultArray.self, from: data)
         return result.results
       } catch {
-        print("JSON Error: \(error)")
-    return [] }
+          print("JSON Error: \(error)")
+          return []
+      }
     }
     
     func showNetworkError() {
@@ -137,63 +157,45 @@ extension SearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         //Now we are working with real data.
+        
         if !searchBar.text!.isEmpty {
-            searchBar.resignFirstResponder()
-            hasSearched = true
-            searchResults = []
-            //Note: the second bang '!' is a forced optional(?)
+          searchBar.resignFirstResponder()
+          isLoading = true
+          tableView.reloadData()
+
+          hasSearched = true
+          searchResults = []
+
+          let queue = DispatchQueue.global()
+          let url = self.iTunesURL(searchText: searchBar.text!)
+          
+        //Working with async, putting request on background thread
+        queue.async {
             
-            let url = iTunesURL(searchText: searchBar.text!)
-            print("URL: '\(url)'")
-            
-            //Now using this code
-            if let data =
-                performStoreRequest(with: url) {
-                searchResults = parse(data: data)
-                searchResults.sort { $0 < $1 }
-            }
-            
+            //moved back
 
             
-            /*
-            if let data = performStoreRequest(with: url) { // Modified
-                
-                searchResults = parse(data: data)
+            if let data = self.performStoreRequest(with: url) {
               
-                searchResults.sort { result1, result2 in
-                  return result1.name.localizedStandardCompare(result2.name)
-                == .orderedAscending
-                }
-                */
-                            
-                tableView.reloadData()
+             self.searchResults = self.parse(data: data)
+             self.searchResults.sort(by: <)
+             
+             /*
+             The 'DispatchQueue.main.async' schedules a closure on the main queue. Then sets 'isLoading' to false then continues to reload the table view.
+              */
+              
+             DispatchQueue.main.async {
+                self.isLoading = false
+                self.tableView.reloadData()
+              }
+             
+             
+              return
             }
-        
-        
-        
-        /*
-         
-         func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-         
-         searchBar.resignFirstResponder()
-         searchResults = []
-         
-         if searchBar.text! != "justin time" {
-         
-         for i in 0 ... 2 {
-         let searchResult = SearchResult()
-         searchResult.name = String(format: "Fake Result %d for", i)
-         searchResult.artistName = searchBar.text!
-         searchResults.append(searchResult)
-         }
-         }
-         
-         hasSearched = true
-         tableView.reloadData()
-         }
-         
-         */
-        
+          }
+        }
+     }//Outside One
+
         
         
         
@@ -202,21 +204,27 @@ extension SearchViewController: UISearchBarDelegate {
             .topAttached
         }
     }
-}
+    
+
+
     
     
     
     
+//**EXTENSION**\\
+   
     
 // MARK: - Table View Delegate
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     
-      if !hasSearched {
-      return 0
+    if isLoading {
+        return 1
+    } else if !hasSearched {
+        return 0
     } else if searchResults.count == 0 {
-      return 1
+        return 1
     } else {
       return searchResults.count
     }
@@ -225,25 +233,36 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
       
-      if searchResults.count == 0 {
-        return tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.nothingFoundCell, for: indexPath)
-      } else {
-        let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
-        let searchResult = searchResults[indexPath.row]
-        cell.nameLabel.text = searchResult.name
-        
+        if isLoading {
+          let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.loadingCell, for: indexPath)
+          
+//***DEBUG:Something here is causing crash ERROR:****
+/*
+ let spinner = cell.viewWithTag(100) as! UIActivityIndicatorView
+ spinner?.startAnimating()
+ */
+            
+//Testing with ? optional
+            let spinner = cell.viewWithTag(100) as? UIActivityIndicatorView
+            spinner?.startAnimating()
+          
+            return cell
+            
+        } else if searchResults.count == 0 {
+          return tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.nothingFoundCell, for: indexPath)
+        } else {
+          let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
+          let searchResult = searchResults[indexPath.row]
+          cell.nameLabel.text = searchResult.name
           if searchResult.artist.isEmpty {
             cell.artistNameLabel.text = "Unknown"
           } else {
-            cell.artistNameLabel.text = String(
-              format: "%@ (%@)",
-              searchResult.artist,
-              searchResult.type)
+            cell.artistNameLabel.text = String(format: "%@ (%@)", searchResult.artist, searchResult.type)
           }
-        
-          return cell
+            return cell
+        }
       }
-    }
+
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
@@ -253,11 +272,13 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
   func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
       
-    if searchResults.count == 0 {
+      if searchResults.count == 0 || isLoading {
         return nil
-    } else {
+      } else {
         return indexPath
+      }
     }
-  }
     
-}
+    
+    
+}//This is closing bracket*******
