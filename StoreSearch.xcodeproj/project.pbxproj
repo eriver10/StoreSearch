@@ -16,6 +16,7 @@
 		38B3590B2ABD61DF004C6FCC /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B3590A2ABD61DF004C6FCC /* SearchResult.swift */; };
 		38B3590D2ABD6B45004C6FCC /* SearchResultCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 38B3590C2ABD6B45004C6FCC /* SearchResultCell.xib */; };
 		38B359112ABDF9A2004C6FCC /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B359102ABDF9A2004C6FCC /* SearchResultCell.swift */; };
+		38B359132ABE16DF004C6FCC /* NothingFoundCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 38B359122ABE16DF004C6FCC /* NothingFoundCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		38B3590A2ABD61DF004C6FCC /* SearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResult.swift; sourceTree = "<group>"; };
 		38B3590C2ABD6B45004C6FCC /* SearchResultCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchResultCell.xib; sourceTree = "<group>"; };
 		38B359102ABDF9A2004C6FCC /* SearchResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
+		38B359122ABE16DF004C6FCC /* NothingFoundCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NothingFoundCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				38B3590A2ABD61DF004C6FCC /* SearchResult.swift */,
 				38B3590C2ABD6B45004C6FCC /* SearchResultCell.xib */,
 				38B359102ABDF9A2004C6FCC /* SearchResultCell.swift */,
+				38B359122ABE16DF004C6FCC /* NothingFoundCell.xib */,
 			);
 			path = StoreSearch;
 			sourceTree = "<group>";
@@ -137,6 +140,7 @@
 				38B359032ABCE83A004C6FCC /* LaunchScreen.storyboard in Resources */,
 				38B359002ABCE83A004C6FCC /* Assets.xcassets in Resources */,
 				38B3590D2ABD6B45004C6FCC /* SearchResultCell.xib in Resources */,
+				38B359132ABE16DF004C6FCC /* NothingFoundCell.xib in Resources */,
 				38B358FE2ABCE838004C6FCC /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
