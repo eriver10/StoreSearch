@@ -167,13 +167,13 @@ extension SearchViewController: UISearchBarDelegate {
           searchResults = []
 
           let queue = DispatchQueue.global()
- //Moving         let url = self.iTunesURL(searchText: searchBar.text!)
+          let url = self.iTunesURL(searchText: searchBar.text!)
           
         //Working with async, putting request on background thread
         queue.async {
             
-            //moved
-            let url = self.iTunesURL(searchText: searchBar.text!)
+            //moved back
+
             
             if let data = self.performStoreRequest(with: url) {
               
