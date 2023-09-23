@@ -9,8 +9,7 @@ import UIKit
 
 class SearchResultCell: UITableViewCell {
     
-    
-    
+    var downloadTask: URLSessionDownloadTask?
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var artistNameLabel: UILabel!
@@ -36,4 +35,34 @@ class SearchResultCell: UITableViewCell {
         // Configure the view for the selected state
     }
 
+    override func prepareForReuse() {
+        
+      super.prepareForReuse()
+      downloadTask?.cancel()
+      downloadTask = nil
+        
+      print("Triggered!!")
+    }
+   
+    // MARK: - Helper Methods
+    func configure(for result: SearchResult) {
+        
+      nameLabel.text = result.name
+
+      if result.artist.isEmpty {
+        artistNameLabel.text = "Unknown"
+      } else {
+        artistNameLabel.text = String(format: "%@ (%@)", result.artist, result.type)
+      }
+        
+      artworkImageView.image = UIImage(systemName: "square")
+        
+      if let smallURL = URL(string: result.imageSmall) {
+        downloadTask = artworkImageView.loadImage(url: smallURL)
+      }
+        
+    }
+    
+    
+    
 }
