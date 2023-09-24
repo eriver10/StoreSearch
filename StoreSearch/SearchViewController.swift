@@ -255,6 +255,12 @@ extension SearchViewController: UISearchBarDelegate {
               let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.loadingCell, for: indexPath)
              
  //ERROR: Debug: why is this broken again?????
+ /*
+  //Correct code should be:
+  let spinner = cell.viewWithTag(100) as! UIActivityIndicatorView
+spinner.startAnimating()
+  */
+                
                 let spinner = cell.viewWithTag(100) as? UIActivityIndicatorView
               spinner?.startAnimating()
               
