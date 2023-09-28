@@ -83,6 +83,7 @@ class SearchViewController: UIViewController {
           let indexPath = sender as! IndexPath
           let searchResult = list[indexPath.row]
           detailViewController.searchResult = searchResult
+            detailViewController.isPopUp = true
         }
       }
     }
@@ -102,7 +103,12 @@ class SearchViewController: UIViewController {
          }
      }
     
-    
+    override func viewWillAppear(_ animated: Bool) {
+      super.viewWillAppear(animated)
+      if UIDevice.current.userInterfaceIdiom == .phone {
+        navigationController?.navigationBar.isHidden = true
+      }
+    }
     
     
     
