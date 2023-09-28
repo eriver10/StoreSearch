@@ -41,7 +41,7 @@ class SearchResultCell: UITableViewCell {
       downloadTask?.cancel()
       downloadTask = nil
         
-      print("Triggered!!")
+     // print("Triggered!!")
     }
    
     // MARK: - Helper Methods

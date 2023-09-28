@@ -9,19 +9,13 @@ import UIKit
 
 class SearchViewController: UIViewController {
     
-    //Reminder: static, in short practical terms, let's us instantiate with out () brackets calling.
-    static let loadingCell = "LoadingCell"
+   
+    //
+    var landscapeVC: LandscapeViewController?
+    private let search = Search()
+    weak var splitViewDetail: DetailViewController?
     
-    //This instance variable adds an array we will use to store our fake search data(Delegate extension bellow).
-    
-    var searchResults = [SearchResult]()
-   // var searchResults = [String]()
-    
-    //Note: every time the user enters into a search the items in this instantiated (created) Array will be updated overwriting the last.
-    var hasSearched = false
-    var isLoading = false
-    var dataTask: URLSessionDataTask?
-    
+    //Warning This code stays
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var segmentedControl: UISegmentedControl!
@@ -31,10 +25,7 @@ class SearchViewController: UIViewController {
         performSearch()
     }
     
-    
-    //This new struct (TableView) includes a secondary struct (CellIdentifiers) it has a constant (SearchResultCell) set to “SearchResultCell”.
-    //Now, if you should ever want to change it, you can update it here and it will trickle down to anything that uses it.
-
+     
     struct TableView {
         
         //A struct within a struct..
@@ -73,52 +64,60 @@ class SearchViewController: UIViewController {
          tableView.register(cellNib, forCellReuseIdentifier: TableView.CellIdentifiers.loadingCell)
 
         
-        searchBar.becomeFirstResponder()
+        if UIDevice.current.userInterfaceIdiom != .pad {
+          searchBar.becomeFirstResponder()
+        }
         
+        title = NSLocalizedString("Search", comment: "split view primary button")
         /*
          "The UINib class is used to load nibs," the book says. This code will set in motion loading the nib. Then, the book continues, it asks, "the table view to register this nib for the reuse identifier “SearchResultCell. From now on, when you call dequeueReusableCell(withIdentifier:) for the identifier “SearchResultCell”, UITableView will automatically make (or reuse) a new cell from the nib..."
          */
     }
     
+    // MARK: - Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+      if segue.identifier == "ShowDetail" {
+        if case .results(let list) = search.state {
+          let detailViewController = segue.destination as! DetailViewController
+          let indexPath = sender as! IndexPath
+          let searchResult = list[indexPath.row]
+          detailViewController.searchResult = searchResult
+        }
+      }
+    }
+    
+    override func willTransition(
+     to newCollection: UITraitCollection,
+     with coordinator: UIViewControllerTransitionCoordinator){
+         
+         super.willTransition(to: newCollection, with: coordinator)
+         
+         switch newCollection.verticalSizeClass {
+         case .compact: 
+             showLandscape(with: coordinator)
+         case .regular, .unspecified:     hideLandscape(with: coordinator)
+         @unknown default:
+             break
+         }
+     }
+    
+    
+    
+    
+    
+    
+    
+    
     // MARK: - Helper Methods
     //Yes, we are using this function to access itunes, however, we are also including to except special characters in the search string.
     
     
-//Error: fixe forgot to put category in parameter.
     
-    func iTunesURL(searchText: String, category: Int) -> URL {
-        
-      let kind: String
-      
-      switch category {
-            case 1: kind = "musicTrack"
-            case 2: kind = "software"
-            case 3: kind = "ebook"
-            default: kind = ""
-       }
-              
-      let encodedText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
-      
-      let urlString = "https://itunes.apple.com/search?" +
-          "term=\(encodedText)&limit=200&entity=\(kind)"
-        
-        
-      let url = URL(string: urlString)
-      
-            return url!
-    }
-    
-    
-    
-    //removing (commenting out) in order to experiment with api.
-     
-    //my bad, the author read my mind. I am now removing the 'func performStoreRequest(with' code entirely...
-     
-   
+ 
      
      
-     
-     
+     /*
     
     //Using JSONDecoder to convert the Json data we get back in our queries
 
@@ -135,7 +134,27 @@ class SearchViewController: UIViewController {
           return []
       }
     }
+    */
+      
+      
     
+ // MARK: - Private Methods
+private func hidePrimaryPane() {
+        
+    UIView.animate(
+        withDuration: 0.25,
+        animations: {
+    self.splitViewController!.preferredDisplayMode
+    = .secondaryOnly
+        }, completion: { _ in
+          self.splitViewController!.preferredDisplayMode
+    = .automatic
+       } 
+    )
+}
+    
+    
+      
     func showNetworkError() {
       
       let alert = UIAlertController(
@@ -150,151 +169,179 @@ class SearchViewController: UIViewController {
         present(alert, animated: true, completion: nil)
       }
     
-  }
+    func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+      
+      guard landscapeVC == nil else { return }
+      landscapeVC = storyboard!.instantiateViewController(withIdentifier: "LandscapeViewController") as? LandscapeViewController
+      
+        if let controller = landscapeVC {
+         
+        controller.search = search
+        controller.view.frame = view.bounds
+        controller.view.alpha = 0
+
+        view.addSubview(controller.view)
+        addChild(controller)
+        coordinator.animate(
+          alongsideTransition: { _ in
+            controller.view.alpha = 1
+              
+            self.searchBar.resignFirstResponder()
+            if self.presentedViewController != nil {
+              self.dismiss(animated: true, completion: nil)
+            }
+          }, completion: { _ in
+            controller.didMove(toParent: self)
+          }
+        )
+      }
+    }
+
+
+    func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+      
+      if let controller = landscapeVC {
+        controller.willMove(toParent: nil)
+        coordinator.animate(
+          alongsideTransition: { _ in
+            controller.view.alpha = 0
+              
+            if self.presentedViewController != nil {
+                          self.dismiss(animated: true, completion: nil)
+                        }
+                      }, completion: { _ in
+                        controller.view.removeFromSuperview()
+                        controller.removeFromParent()
+                        self.landscapeVC = nil
+                      }
+                    )
+                  }
+                }
+              }
+
+  
+
+
 
     
     
+
+
+
+
+
+
     
 
 //**EXTENSION 1**\\
 
-//Reminder we are reaching across a void to dictate an action.
-
-//Adding additional inheritance, UITableViewDataSource in order fake some search results.
-
-
-//MARK: - Search Bar Delegate
-
+// MARK: - Search Bar Delegate
 extension SearchViewController: UISearchBarDelegate {
     
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+      
+    performSearch()
+      
+  }
 
-      performSearch()
+  func performSearch() {
+      
+    if let category = Search.Category(rawValue: segmentedControl.selectedSegmentIndex) {
+      search.performSearch(
+        for: searchBar.text!,
+        category: category) { success in
+        if !success {
+          self.showNetworkError()
+        }
+        self.tableView.reloadData()
+            
+        self.landscapeVC?.searchResultsReceived()
+      }
+
+      tableView.reloadData()
+      searchBar.resignFirstResponder()
     }
+  }
 
-    func performSearch() {
-        
-        if !searchBar.text!.isEmpty {
-            searchBar.resignFirstResponder()
-            isLoading = true
-            tableView.reloadData()
-            
-            hasSearched = true
-            searchResults = []
-            
-            
-            //New URL connection code.
+  func position(for bar: UIBarPositioning) -> UIBarPosition {
+      
+    .topAttached
+  }
+}
 
-            let url = iTunesURL(searchText: searchBar.text!, category: segmentedControl.selectedSegmentIndex)
-            let session = URLSession.shared
-            dataTask = session.dataTask(with: url) {data, response, error in
-              // 4
-              if let error = error as NSError?, error.code == -999 {
-                return
-              } else if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                if let data = data {
-                  self.searchResults = self.parse(data: data)
-                  self.searchResults.sort(by: <)
-                  DispatchQueue.main.async {
-                    self.isLoading = false
-                    self.tableView.reloadData()
-                  }
-                  return
-                }
-              } else {
-                print("Failure! \(response!)")
-              }
-              DispatchQueue.main.async {
-                self.hasSearched = false
-                self.isLoading = false
-                self.tableView.reloadData()
-                self.showNetworkError()
-              }
-            }
-            dataTask?.resume()
-          }
-        }
+//**EXTENSION 2**\\
 
-        
-        func position(for bar: UIBarPositioning) -> UIBarPosition {
-            
-            .topAttached
-        }
-        
+// MARK: - Table View Delegate
+extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
+    
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+      
+    switch search.state {
+    case .notSearchedYet:
+      return 0
+    case .loading:
+      return 1
+    case .noResults:
+      return 1
+    case .results(let list):
+      return list.count
     }
+  }
 
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+      
+    switch search.state {
+    case .notSearchedYet:
+      fatalError("Should never get here")
 
-    
-    
-    
-    
-    
-    //**EXTENSION 2**\\
-    
-    
-    // MARK: - Table View Delegate
-    extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
+    case .loading:
+      let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.loadingCell, for: indexPath)
         
-        func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-            
-            if isLoading {
-                return 1
-            } else if !hasSearched {
-                return 0
-            } else if searchResults.count == 0 {
-                return 1
-            } else {
-                return searchResults.count
-            }
-        }
+        //DEBUG: Error nil
+      let spinner = cell.viewWithTag(100) as? UIActivityIndicatorView
         
+      spinner?.startAnimating()
         
-        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            
-            if isLoading {
-              let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.loadingCell, for: indexPath)
-             
- //ERROR: Debug: why is this broken again?????
- /*
-  //Correct code should be:
-  let spinner = cell.viewWithTag(100) as! UIActivityIndicatorView
-spinner.startAnimating()
-  */
-                
-                let spinner = cell.viewWithTag(100) as? UIActivityIndicatorView
-              spinner?.startAnimating()
-              
-                return cell
-            } else if searchResults.count == 0 {
-                return tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.nothingFoundCell, for: indexPath)
-            } else {
-              
-        let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
-              
-        let searchResult = searchResults[indexPath.row]
-              cell.configure(for: searchResult)
-              
-                return cell
-            }
-          }
-    
-    
+        return cell
+
+    case .noResults:
+      return tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.nothingFoundCell, for: indexPath)
+
+    case .results(let list):
+      let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
+      let searchResult = list[indexPath.row]
+      cell.configure(for: searchResult)
+        
+        return cell
+    }
+  }
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        tableView.deselectRow(at: indexPath, animated: true)
-    }
-    
-    
-        func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-            
-            if searchResults.count == 0 || isLoading {
-                
-                return nil
-                
-            } else {
-                return indexPath
-                
+        searchBar.resignFirstResponder()
+        if view.window!.rootViewController!.traitCollection
+            .horizontalSizeClass == .compact {
+            tableView.deselectRow(at: indexPath, animated: true)
+            performSegue(withIdentifier: "ShowDetail",
+                         sender: indexPath)
+        } else {
+            if case .results(let list) = search.state {
+                splitViewDetail?.searchResult = list[indexPath.row]
             }
-                    
+            
+            if splitViewController!.displayMode != .oneBesideSecondary {
+                hidePrimaryPane()
+            }
+        }
     }
-}//This is closing bracket*******
+
+  func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+      
+    switch search.state {
+    case .notSearchedYet, .loading, .noResults:
+      return nil
+    case .results:
+      return indexPath
+    }
+  }
+}
