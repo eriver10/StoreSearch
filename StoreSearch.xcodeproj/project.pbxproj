@@ -17,6 +17,7 @@
 		38B1E1162AC4A65E005C10AF /* LoadingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 38B1E1182AC4A65E005C10AF /* LoadingCell.xib */; };
 		38B1E11E2AC4B53C005C10AF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 38B1E1202AC4B53C005C10AF /* Localizable.strings */; };
 		38B1E1242AC4BFFE005C10AF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 38B1E1262AC4BFFE005C10AF /* InfoPlist.strings */; };
+		38B1E12D2AC5F811005C10AF /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B1E12C2AC5F811005C10AF /* MenuViewController.swift */; };
 		38B358F72ABCE838004C6FCC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B358F62ABCE838004C6FCC /* AppDelegate.swift */; };
 		38B358F92ABCE838004C6FCC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B358F82ABCE838004C6FCC /* SceneDelegate.swift */; };
 		38B358FB2ABCE838004C6FCC /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B358FA2ABCE838004C6FCC /* SearchViewController.swift */; };
@@ -45,6 +46,7 @@
 		38B1E1212AC4B769005C10AF /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		38B1E1252AC4BFFE005C10AF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		38B1E1272AC4C001005C10AF /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		38B1E12C2AC5F811005C10AF /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		38B358F32ABCE838004C6FCC /* StoreSearch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoreSearch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		38B358F62ABCE838004C6FCC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		38B358F82ABCE838004C6FCC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				384A31D92AC290C900206B63 /* FadeOutAnimationController.swift */,
 				38B1E1202AC4B53C005C10AF /* Localizable.strings */,
 				38B1E1262AC4BFFE005C10AF /* InfoPlist.strings */,
+				38B1E12C2AC5F811005C10AF /* MenuViewController.swift */,
 			);
 			path = StoreSearch;
 			sourceTree = "<group>";
@@ -193,6 +196,7 @@
 				384A31DC2AC3FC7B00206B63 /* Search.swift in Sources */,
 				38B358FB2ABCE838004C6FCC /* SearchViewController.swift in Sources */,
 				38B358F72ABCE838004C6FCC /* AppDelegate.swift in Sources */,
+				38B1E12D2AC5F811005C10AF /* MenuViewController.swift in Sources */,
 				384A31DA2AC290C900206B63 /* FadeOutAnimationController.swift in Sources */,
 				38B359172ABFC3E8004C6FCC /* UIImageView+DownloadImage.swift in Sources */,
 				38B3590B2ABD61DF004C6FCC /* SearchResult.swift in Sources */,
